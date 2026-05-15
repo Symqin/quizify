@@ -13,6 +13,7 @@ export async function POST(req: Request) {
     const formData = await req.formData();
     const materi = formData.get('materi') as string;
     const tingkatKesulitan = formData.get('tingkatKesulitan') as string;
+    const jumlahSoal = formData.get('jumlahSoal') as string || '10';
     const file = formData.get('file') as File | null;
 
     if (!tingkatKesulitan || (!materi && !file)) {
@@ -21,7 +22,7 @@ export async function POST(req: Request) {
 
     const model = genAI.getGenerativeModel({ model: 'gemini-flash-latest' });
 
-    let prompt = `Kamu adalah asisten dosen. Buat kuis pilihan ganda berjumlah 10 soal dari materi berikut. Tingkat kesulitan: ${tingkatKesulitan}. Output HARUS berformat JSON murni berupa array of objects. Setiap object berisi key: 'pertanyaan', 'opsi' (array 4 string), 'jawabanBenar' (string, harus sama persis dengan salah satu opsi), 'penjelasan' (maksimal 2 kalimat, langsung to the point sebutkan keywordnya), dan 'topik' (keyword topik soal tersebut).`;
+    let prompt = `Kamu adalah asisten dosen. Buat kuis pilihan ganda berjumlah ${jumlahSoal} soal dari materi berikut. Tingkat kesulitan: ${tingkatKesulitan}. Output HARUS berformat JSON murni berupa array of objects. Setiap object berisi key: 'pertanyaan', 'opsi' (array 4 string), 'jawabanBenar' (string, harus sama persis dengan salah satu opsi), 'penjelasan' (maksimal 2 kalimat, langsung to the point sebutkan keywordnya), dan 'topik' (keyword topik soal tersebut).`;
 
     if (materi) {
       prompt += `\n\nMateri:\n${materi}`;

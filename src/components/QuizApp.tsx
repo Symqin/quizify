@@ -21,6 +21,7 @@ export default function QuizApp() {
   // Phase 1 States
   const [materi, setMateri] = useState('');
   const [file, setFile] = useState<File | null>(null);
+  const [jumlahSoal, setJumlahSoal] = useState<number>(10);
   const [difficulty, setDifficulty] = useState<Difficulty>('Medium');
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState('');
@@ -50,6 +51,7 @@ export default function QuizApp() {
       const formData = new FormData();
       if (materi) formData.append('materi', materi);
       formData.append('tingkatKesulitan', difficulty);
+      formData.append('jumlahSoal', jumlahSoal.toString());
       if (file) formData.append('file', file);
 
       const res = await fetch('/api/generate', {
@@ -147,15 +149,15 @@ export default function QuizApp() {
                 }} />
               </label>
             ) : (
-              <div className="flex items-center justify-between p-4 bg-blue-50 border border-blue-200 rounded-2xl">
+              <div className="flex items-center justify-between p-4 bg-blue-50 border border-blue-200 rounded-2xl h-32">
                 <div className="flex items-center gap-3">
                   <FileText className="w-6 h-6 text-blue-600" />
                   <div>
-                    <p className="text-sm font-semibold text-blue-800">{file.name}</p>
+                    <p className="text-sm font-semibold text-blue-800 line-clamp-1">{file.name}</p>
                     <p className="text-xs text-blue-600">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
                   </div>
                 </div>
-                <button onClick={() => setFile(null)} className="p-2 hover:bg-blue-100 rounded-full transition-colors text-blue-700">
+                <button onClick={() => setFile(null)} className="p-2 hover:bg-blue-100 rounded-full transition-colors text-blue-700 flex-shrink-0">
                   <X className="w-5 h-5" />
                 </button>
               </div>
@@ -170,22 +172,39 @@ export default function QuizApp() {
           />
         </div>
 
-        <div>
-          <label className="block text-sm font-semibold text-slate-700 mb-3">Tingkat Kesulitan</label>
-          <div className="grid grid-cols-3 gap-4">
-            {(['Easy', 'Medium', 'Hard'] as Difficulty[]).map((level) => (
-              <button
-                key={level}
-                onClick={() => setDifficulty(level)}
-                className={`py-3 px-4 rounded-xl border-2 font-medium transition-all ${
-                  difficulty === level 
-                    ? 'border-blue-500 bg-blue-50 text-blue-700' 
-                    : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50'
-                }`}
-              >
-                {level}
-              </button>
-            ))}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-3">Jumlah Soal</label>
+            <div className="flex flex-col gap-2">
+              <input 
+                type="number" 
+                min="1" 
+                max="50"
+                value={jumlahSoal}
+                onChange={(e) => setJumlahSoal(parseInt(e.target.value) || 10)}
+                className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all text-slate-700 outline-none font-medium h-[52px]"
+              />
+              <p className="text-xs text-slate-500">Tentukan jumlah soal yang akan dibuat (1 - 50).</p>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-3">Tingkat Kesulitan</label>
+            <div className="grid grid-cols-3 gap-4">
+              {(['Easy', 'Medium', 'Hard'] as Difficulty[]).map((level) => (
+                <button
+                  key={level}
+                  onClick={() => setDifficulty(level)}
+                  className={`h-[52px] rounded-xl border-2 font-medium transition-all ${
+                    difficulty === level 
+                      ? 'border-blue-500 bg-blue-50 text-blue-700' 
+                      : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50'
+                  }`}
+                >
+                  {level}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
